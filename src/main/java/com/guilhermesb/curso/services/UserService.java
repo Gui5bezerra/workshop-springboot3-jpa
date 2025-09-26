@@ -12,6 +12,8 @@ import com.guilhermesb.curso.entities.User;
 import com.guilhermesb.curso.repositories.UserRepository;
 import com.guilhermesb.curso.resources.exceptions.DatabaseException;
 
+import jakarta.persistence.EntityNotFoundException;
+
 @Service
 public class UserService {
 
@@ -42,10 +44,13 @@ public class UserService {
 	}
 
 	public User update(Long id, User obj) {
-		User entity = repository.getReferenceById(id);
-		updateData(entity, obj);
-		return repository.save(entity);
-
+		try {
+			User entity = repository.getReferenceById(id);
+			updateData(entity, obj);
+			return repository.save(entity);
+		} catch (EntityNotFoundException e) {
+			throw new ResourceNotFoundException(id);
+		}
 	}
 
 	private void updateData(User entity, User obj) {
